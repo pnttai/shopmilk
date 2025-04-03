@@ -1,6 +1,6 @@
 import './index.css';
 import './App.css';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import toast,{ Toaster } from 'react-hot-toast';
@@ -11,11 +11,15 @@ import { setUserDetails } from './store/userSlice';
 import SummaryApi from './common/SummaryApi';
 import Axios from './utils/Axios';
 import AxiosToastError from './utils/AxiosToastError';
-import { setAllCategory ,setAllSubCategory } from './store/productSlice'
+import { setAllCategory ,setAllSubCategory ,setLoadingCategory } from './store/productSlice'
+import GlobalProvider from './provider/GlobalProvider';
+import { FaCartShopping } from "react-icons/fa6";
+import CartMobileLink from './components/CartMoblie';
 
 function App() {
   const dispatch = useDispatch()
-
+  const location = useLocation()
+ 
   const fetchUser = async()=>{
     const userData = await fetchUserDetails()
 
@@ -23,7 +27,7 @@ function App() {
   }
   const fetchCategory = async () => {
           try {
-       
+              dispatch(setLoadingCategory(true))
               const response = await Axios({
                   ...SummaryApi.getCategory
               })
@@ -35,6 +39,8 @@ function App() {
           } catch (error) {          
           } finally {
           }
+          dispatch(setLoadingCategory(false))
+ 
       };
 
       const fetchSubCategory = async () => {
@@ -60,14 +66,19 @@ function App() {
   },[])
 
   return (
-    <>
+    <GlobalProvider>
       <Header />
       <main className='min-h-[70vh]'>
         <Outlet />
       </main>
       <Footer />
       <Toaster />
-    </>
+      {
+        location.pathname !== '/checkout' && (
+          <CartMobileLink/>
+        )
+      }
+     </GlobalProvider>
   );
 }
 

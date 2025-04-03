@@ -3,10 +3,13 @@ import React, { useEffect, useState } from 'react'
 import AxiosToastError from '../utils/AxiosToastError'
 
 import Loading from '../components/Loading'
-import ProductCardAdmin from '../components/ProductCardAdmin'
+
 import { IoSearchOutline } from "react-icons/io5";
 import SummaryApi from '../common/SummaryApi'
 import Axios from '../utils/Axios';
+import EditProductAdmin from '../components/EditProductAdmin';
+import ProductCardAdmin from '../components/ProductCardAdmin';
+
 
 
 const ProductAdmin = () => {
@@ -28,12 +31,16 @@ const ProductAdmin = () => {
                   search :search
               }
           })
+         
 
           const {data : responseData} = response
 
+          
+
           if(responseData.success){
-            setTotalPageCount(responseData.totalNoPage)
+            setTotalPageCount(responseData.totalNopage)
               setProductData(responseData.data)
+             
               
           }
 
@@ -106,7 +113,7 @@ const ProductAdmin = () => {
       <div className='min-h-[55vh]'>
         <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 '>
           {
-            productData.map((p,index)=>{
+            productData.map((p)=>{
               return(
                 <ProductCardAdmin data={p}/>
               )
@@ -122,6 +129,7 @@ const ProductAdmin = () => {
       </div>
     </div>
     
+    <EditProductAdmin/>
     </section>
   )
 }
