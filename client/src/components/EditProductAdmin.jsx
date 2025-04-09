@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { FaCloudUploadAlt } from "react-icons/fa";
-import uploadImage from '../utils/Uploadimage.js';
+import uploadImage from '../utils/Uploadimage';
 import Loading from '../components/Loading';
 import ViewImage from '../components/ViewImage';
 import { MdDelete } from "react-icons/md";
@@ -14,18 +14,38 @@ import successAlert from '../utils/SuccessAlert';
 
 
 const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
-  const [data, setData] = useState({
-    _id : propsData._id,
-    name: propsData.name,
-    image: propsData.image,
-    category: propsData.category,
-    subCategory: propsData.subCategory,
-    unit: propsData.unit,
-    stock: propsData.stock,
-    price: propsData.price,
-    discount: propsData.discount,
-    description: propsData.description,
-    more_details: propsData.more_details || {},
+  const [data, setData] = useState(() => {
+    // Kiểm tra nếu propsData không tồn tại thì trả về object với giá trị mặc định
+    if (!propsData) {
+      return {
+        _id: '',
+        name: '',
+        image: [],
+        category: [],
+        subCategory: [],
+        unit: '',
+        stock: '',
+        price: '',
+        discount: '',
+        description: '',
+        more_details: {},
+      }
+    }
+    
+    // Nếu có propsData thì sử dụng giá trị từ props
+    return {
+      _id: propsData._id || '',
+      name: propsData.name || '',
+      image: propsData.image || [],
+      category: propsData.category || [],
+      subCategory: propsData.subCategory || [],
+      unit: propsData.unit || '',
+      stock: propsData.stock || '',
+      price: propsData.price || '',
+      discount: propsData.discount || '',
+      description: propsData.description || '',
+      more_details: propsData.more_details || {},
+    }
   })
   const [imageLoading, setImageLoading] = useState(false)
   const [ViewImageURL, setViewImageURL] = useState("")
@@ -80,20 +100,23 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
   }
 
   const handleRemoveCategory = async (index) => {
-    data.category.splice(index, 1)
-    setData((preve) => {
-      return {
-        ...preve
-      }
-    })
+    if (!data?.category) return
+    const newCategory = [...data.category]
+    newCategory.splice(index, 1)
+    setData(preve => ({
+      ...preve,
+      category: newCategory
+    }))
   }
+  
   const handleRemoveSubCategory = async (index) => {
-    data.subCategory.splice(index, 1)
-    setData((preve) => {
-      return {
-        ...preve
-      }
-    })
+    if (!data?.subCategory) return
+    const newSubCategory = [...data.subCategory]
+    newSubCategory.splice(index, 1)
+    setData(preve => ({
+      ...preve,
+      subCategory: newSubCategory
+    }))
   }
 
   const handleAddField = () => {
@@ -153,7 +176,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
       <div className='bg-white w-full p-4 max-w-2xl mx-auto rounded overflow-y-auto h-full max-h-[95vh]'>
         <section className=''>
           <div className='p-2   bg-white shadow-md flex items-center justify-between'>
-            <h2 className='font-semibold'>Tải lên sản phẩm</h2>
+            <h2 className='font-semibold'>Upload Product</h2>
             <button onClick={close}>
               <IoClose size={20}/>
             </button>
@@ -161,7 +184,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
           <div className='grid p-3'>
             <form className='grid gap-4' onSubmit={handleSubmit}>
               <div className='grid gap-1'>
-                <label htmlFor='name' className='font-medium'>Tên</label>
+                <label htmlFor='name' className='font-medium'>Name</label>
                 <input
                   id='name'
                   type='text'
@@ -174,7 +197,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
                 />
               </div>
               <div className='grid gap-1'>
-                <label htmlFor='description' className='font-medium'>miêu tả</label>
+                <label htmlFor='description' className='font-medium'>Description</label>
                 <textarea
                   id='description'
                   type='text'
@@ -189,7 +212,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
                 />
               </div>
               <div>
-                <p className='font-medium'>Hình ảnh</p>
+                <p className='font-medium'>Image</p>
                 <div>
                   <label htmlFor='productImage' className='bg-blue-50 h-24 border rounded flex justify-center items-center cursor-pointer'>
                     <div className='text-center flex justify-center items-center flex-col'>
@@ -234,8 +257,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
 
               </div>
               <div className='grid gap-1'>
-                <label className='font-medium'>Danh mục
-                </label>
+                <label className='font-medium'>Category</label>
                 <div>
                   <select
                     className='bg-blue-50 border w-full p-2 rounded'
@@ -253,7 +275,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
                       setSelectCategory("")
                     }}
                   >
-                    <option value={""}>Chọn danh mục</option>
+                    <option value={""}>Select Category</option>
                     {
                       allCategory.map((c) => {
                         return (
@@ -279,7 +301,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
                 </div>
               </div>
               <div className='grid gap-1'>
-                <label className='font-medium'>Thể loại phụ</label>
+                <label className='font-medium'>Sub Category</label>
                 <div>
                   <select
                     className='bg-blue-50 border w-full p-2 rounded'
@@ -297,7 +319,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
                       setSelectSubCategory("")
                     }}
                   >
-                    <option value={""} className='text-neutral-600'>Chọn danh mục phụ</option>
+                    <option value={""} className='text-neutral-600'>Select Sub Category</option>
                     {
                       allSubCategory.map((c) => {
                         return (
@@ -338,7 +360,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
               </div>
 
               <div className='grid gap-1'>
-                <label htmlFor='stock' className='font-medium'>Số lượng cổ phiếu</label>
+                <label htmlFor='stock' className='font-medium'>Number of Stock</label>
                 <input
                   id='stock'
                   type='number'
@@ -352,7 +374,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
               </div>
 
               <div className='grid gap-1'>
-                <label htmlFor='price' className='font-medium'>Giá</label>
+                <label htmlFor='price' className='font-medium'>Price</label>
                 <input
                   id='price'
                   type='number'
@@ -366,7 +388,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
               </div>
 
               <div className='grid gap-1'>
-                <label htmlFor='discount' className='font-medium'>Giảm giá</label>
+                <label htmlFor='discount' className='font-medium'>Discount</label>
                 <input
                   id='discount'
                   type='number'
