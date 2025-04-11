@@ -142,11 +142,16 @@ const ProductDisplayPage = () => {
                     <p className='line-through'>{DisplayPriceInRupees(data.price)}</p>
                   )
                 }
-                {
-                  data.discount && (
-                    <p className="font-bold text-green-600 lg:text-2xl">{data.discount}% <span className='text-base text-neutral-500'>Giảm giá</span></p>
-                  )
-                }
+               {
+  data.discount ? (
+    <p className="font-bold text-red-600 lg:text-2xl">
+      {data.discount}% <span className='text-base text-neutral-500'>Giảm giá</span>
+    </p>
+  ) : (
+    <p className="font-bold text-green-600 lg:text-m ">Không giảm giá</p>
+  )
+}
+
                 
               </div>
 

@@ -29,7 +29,7 @@ const UserMenu = ({close}) => {
             dispatch(logout())
             localStorage.clear()
             toast.success(response.data.message)
-           navigate("/")
+           navigate("/login")
           }
         } catch (error) {
           AxiosToastError(error)

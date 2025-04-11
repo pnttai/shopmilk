@@ -54,60 +54,68 @@ export const pricewithDiscount = (price,dis = 1)=>{
     return actualPrice
 }
 
-export async function paymentController(request,response){
+export async function paymentController(request, response) {
     try {
-        const userId = request.userId // auth middleware 
-        const { list_items, totalAmt, addressId,subTotalAmt } = request.body 
+        const userId = request.userId; // auth middleware
+        const { list_items, totalAmt, addressId, subTotalAmt } = request.body;
 
-        const user = await UserModel.findById(userId)
+        const user = await UserModel.findById(userId);
 
-        const line_items  = list_items.map(item =>{
-            return{
-               price_data : {
-                    currency : 'inr',
-                    product_data : {
-                        name : item.productId.name,
-                        images : item.productId.image,
-                        metadata : {
-                            productId : item.productId._id
+        // Tỷ giá VNĐ sang USD (tạm dùng, nên lấy từ API tỷ giá thật)
+        const VND_to_USD = 0.000039;
+
+        const line_items = list_items.map(item => {
+            const priceVND = pricewithDiscount(item.productId.price, item.productId.discount);
+            const priceUSD = Math.round(priceVND * VND_to_USD * 100); // đổi sang cent
+
+            return {
+                price_data: {
+                    currency: 'usd', // dùng USD thay vì INR
+                    product_data: {
+                        name: item.productId.name,
+                        images: item.productId.image,
+                        metadata: {
+                            productId: item.productId._id,
+                            originalPriceVND: priceVND
                         }
                     },
-                    unit_amount : pricewithDiscount(item.productId.price,item.productId.discount) * 100   
-               },
-               adjustable_quantity : {
-                    enabled : true,
-                    minimum : 1
-               },
-               quantity : item.quantity 
-            }
-        })
+                    unit_amount: priceUSD
+                },
+                adjustable_quantity: {
+                    enabled: true,
+                    minimum: 1
+                },
+                quantity: item.quantity
+            };
+        });
 
         const params = {
-            submit_type : 'pay',
-            mode : 'payment',
-            payment_method_types : ['card'],
-            customer_email : user.email,
-            metadata : {
-                userId : userId,
-                addressId : addressId
+            submit_type: 'pay',
+            mode: 'payment',
+            payment_method_types: ['card'],
+            customer_email: user.email,
+            metadata: {
+                userId: userId,
+                addressId: addressId
             },
-            line_items : line_items,
-            success_url : `${process.env.FRONTEND_URL}/success`,
-            cancel_url : `${process.env.FRONTEND_URL}/cancel`
-        }
+            line_items: line_items,
+            success_url: `${process.env.FRONTEND_URL}/success`,
+            cancel_url: `${process.env.FRONTEND_URL}/cancel`
+        };
 
-        const session = await Stripe.checkout.sessions.create(params)
+        const session = await Stripe.checkout.sessions.create(params);
 
-        return response.status(200).json(session)
+        return response.status(200).json(session);
 
     } catch (error) {
         return response.status(500).json({
-            message : error.message || error,
-            error : true,
-            success : false
-        })
+            message: error.message || error,
+            error: true,
+            success: false
+        });
     }
 }
+
 
 
 const getOrderProductItems = async({

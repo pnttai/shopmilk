@@ -14,38 +14,18 @@ import successAlert from '../utils/SuccessAlert';
 
 
 const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
-  const [data, setData] = useState(() => {
-    // Kiểm tra nếu propsData không tồn tại thì trả về object với giá trị mặc định
-    if (!propsData) {
-      return {
-        _id: '',
-        name: '',
-        image: [],
-        category: [],
-        subCategory: [],
-        unit: '',
-        stock: '',
-        price: '',
-        discount: '',
-        description: '',
-        more_details: {},
-      }
-    }
-    
-    // Nếu có propsData thì sử dụng giá trị từ props
-    return {
-      _id: propsData._id || '',
-      name: propsData.name || '',
-      image: propsData.image || [],
-      category: propsData.category || [],
-      subCategory: propsData.subCategory || [],
-      unit: propsData.unit || '',
-      stock: propsData.stock || '',
-      price: propsData.price || '',
-      discount: propsData.discount || '',
-      description: propsData.description || '',
-      more_details: propsData.more_details || {},
-    }
+  const [data, setData] = useState({
+    _id : propsData._id,
+    name: propsData.name,
+    image: propsData.image,
+    category: propsData.category,
+    subCategory: propsData.subCategory,
+    unit: propsData.unit,
+    stock: propsData.stock,
+    price: propsData.price,
+    discount: propsData.discount,
+    description: propsData.description,
+    more_details: propsData.more_details || {},
   })
   const [imageLoading, setImageLoading] = useState(false)
   const [ViewImageURL, setViewImageURL] = useState("")
@@ -100,23 +80,20 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
   }
 
   const handleRemoveCategory = async (index) => {
-    if (!data?.category) return
-    const newCategory = [...data.category]
-    newCategory.splice(index, 1)
-    setData(preve => ({
-      ...preve,
-      category: newCategory
-    }))
+    data.category.splice(index, 1)
+    setData((preve) => {
+      return {
+        ...preve
+      }
+    })
   }
-  
   const handleRemoveSubCategory = async (index) => {
-    if (!data?.subCategory) return
-    const newSubCategory = [...data.subCategory]
-    newSubCategory.splice(index, 1)
-    setData(preve => ({
-      ...preve,
-      subCategory: newSubCategory
-    }))
+    data.subCategory.splice(index, 1)
+    setData((preve) => {
+      return {
+        ...preve
+      }
+    })
   }
 
   const handleAddField = () => {
@@ -321,7 +298,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
                   >
                     <option value={""} className='text-neutral-600'>Select Sub Category</option>
                     {
-                      allSubCategory.map((c) => {
+                      allSubCategory.map((c, index) => {
                         return (
                           <option value={c?._id}>{c.name}</option>
                         )
@@ -404,7 +381,7 @@ const EditProductAdmin = ({ close ,data : propsData,fetchProductData}) => {
 
               {/**add more field**/}
               {
-                Object?.keys(data?.more_details)?.map((k) => {
+                Object?.keys(data?.more_details)?.map((k, index) => {
                   return (
                     <div className='grid gap-1'>
                       <label htmlFor={k} className='font-medium'>{k}</label>

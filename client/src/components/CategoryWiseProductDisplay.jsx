@@ -69,46 +69,56 @@ const CategoryWiseProductDisplay = ({ id, name }) => {
   }
 
   const redirectURL =  handleRedirectProductListpage()
-    return (
-        <div>
-            <div className='container mx-auto p-4 flex items-center justify-between gap-4'>
-                <h3 className='font-semibold text-lg md:text-xl'>{name}</h3>
-                <Link  to={redirectURL} className='text-green-600 hover:text-green-400'>See All</Link>
+  return (
+    <section>
+        <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+            <h3 className="font-semibold text-lg md:text-xl">{name}</h3>
+            <Link to={redirectURL} className="text-green-600 hover:text-green-400"></Link>
+        </div>
+
+        <div className="relative">
+            {/* Slider Container */}
+            <div
+                ref={containerRef}
+                className="container mx-auto px-4 flex gap-4 overflow-x-auto scroll-smooth scrollbar-none"
+                style={{ scrollSnapType: 'x mandatory' }}
+            >
+                {loading ? (
+                    loadingCardNumber.map((_, index) => (
+                        <CardProduct key={`loading-${index}`} />
+                    ))
+                ) : (
+                    data.map((product, index) => (
+                        <div
+                            key={`${product._id}-${index}`}
+                            className="flex-shrink-0 w-[calc(100%/4-1rem)] scroll-snap-align-start"
+                        >
+                            <CardProduct data={product} />
+                        </div>
+                    ))
+                )}
             </div>
-            <div className='relative flex items-center '>
-                <div className=' flex gap-4 md:gap-6 lg:gap-8 container mx-auto px-4 overflow-x-scroll scrollbar-none scroll-smooth' ref={containerRef}>
-                    {loading &&
-                        loadingCardNumber.map((_, index) => {
-                            return (
-                                <CardProduct key={"CategorywiseProductDisplay123" + index} />
-                            )
-                        })
-                    }
 
-
-                    {
-                        data.map((p, index) => {
-                            return (
-                                <CardProduct
-                                    data={p}
-                                    key={p._id + "CategorywiseProductDisplay" + index}
-                                />
-                            )
-                        })
-                    }
-
-                </div>
-                <div className='w-full left-0 right-0 container mx-auto  px-2  absolute hidden lg:flex justify-between'>
-                    <button onClick={handleScrollLeft} className='z-10 relative bg-white hover:bg-gray-100 shadow-lg text-lg p-2 rounded-full'>
+            {/* Scroll Buttons */}
+            {data.length > 4 && (
+                <div className="absolute inset-0 flex justify-between items-center px-4 pointer-events-none">
+                    <button
+                        onClick={handleScrollLeft}
+                        className="pointer-events-auto bg-white hover:bg-gray-100 shadow p-2 rounded-full"
+                    >
                         <FaAngleLeft />
                     </button>
-                    <button onClick={handleScrollRight} className='z-10 relative  bg-white hover:bg-gray-100 shadow-lg p-2 text-lg rounded-full'>
+                    <button
+                        onClick={handleScrollRight}
+                        className="pointer-events-auto bg-white hover:bg-gray-100 shadow p-2 rounded-full"
+                    >
                         <FaAngleRight />
                     </button>
                 </div>
-            </div>
+            )}
         </div>
-    )
+    </section>
+);
 }
 
 export default CategoryWiseProductDisplay

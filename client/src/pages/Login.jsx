@@ -51,7 +51,7 @@ const Login = () => {
           email: "",
           password: "",
         });
-        navigate("/dashboard/category");
+        navigate("/");
       }
       console.log("response", response);
     } catch (error) {
